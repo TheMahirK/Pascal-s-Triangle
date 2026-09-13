@@ -200,6 +200,6 @@ async function animateTriangle(data) {
 }
 
 
-const data = pascalsTriangle(6);
+const data = pascalsTriangle(16);
 
 animateTriangle(data);
