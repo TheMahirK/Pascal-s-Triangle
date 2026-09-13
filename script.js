@@ -38,7 +38,8 @@ function getCombination(row, column) {
     let result = 1;
 
     for (let step = 0; step < column; step++) {
-        result *= (row - step) / (step + 1);
+        // Round after each division to remove floating-point representation drift.
+        result = Math.round(result * (row - step) / (step + 1));
     }
 
     return result;

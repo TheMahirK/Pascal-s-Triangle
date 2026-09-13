@@ -27,7 +27,7 @@
     <form id="initial-form" class="row-form" novalidate>
         <label for="initial-rows">How many rows should Pascal's triangle have?</label>
         <div class="form-controls">
-            <input id="initial-rows" name="rows" type="number" min="1" max="10" step="1" required
+            <input id="initial-rows" name="rows" type="number" min="1" max="12" step="1" required
                 aria-describedby="initial-error" autofocus>
             <button type="submit">Build triangle</button>
         </div>
@@ -37,7 +37,7 @@
     <form id="rows-form" class="row-form rebuild-form" novalidate hidden>
         <label for="rows">Build another triangle</label>
         <div class="form-controls">
-            <input id="rows" name="rows" type="number" min="1" max="10" step="1" required aria-describedby="rows-error">
+            <input id="rows" name="rows" type="number" min="1" max="12" step="1" required aria-describedby="rows-error">
             <button type="submit">Rebuild</button>
         </div>
         <p id="rows-error" class="form-error" role="alert"></p>

@@ -7,7 +7,7 @@ rebuild the triangle at any time.
 
 ## Features
 
-- Builds between **1 and 10 rows**.
+- Builds between **1 and 12 rows**.
 - Requests the row count when the page first loads.
 - Provides a rebuild form in the bottom-right corner.
 - Keeps the previous row count in the rebuild form.
@@ -23,12 +23,12 @@ project uses no server-side code or external modules.
 
 ## How to use it
 
-1. Enter an integer from `1` to `10` in the first form.
+1. Enter an integer from `1` to `12` in the first form.
 2. Select **Build triangle**.
 3. Use the speed slider to control the animation from `0.25x` to `4x`.
 4. Enter another row count in the bottom-right form to rebuild the triangle.
 
-Values below `1`, decimal values, blank values, and values above `10` are
+Values below `1`, decimal values, blank values, and values above `12` are
 rejected. The form remains available so the user can try again.
 
 ## Project files
@@ -63,7 +63,9 @@ The first row uses `n = 0`, so the generated values begin as:
 ```
 
 The code calculates each row independently and stores the result as a
-two-dimensional array.
+two-dimensional array. Coefficients are rounded to exact integers after each
+step, preventing floating-point display errors through at least 20 rows even
+though the user-facing limit is 12 rows.
 
 ## JavaScript functions
 
@@ -109,7 +111,7 @@ transition duration is adjusted using the same speed setting.
 | Constant | Meaning |
 | --- | --- |
 | `MIN_ROWS` | Smallest accepted row count: `1` |
-| `MAX_ROWS` | Largest accepted row count: `10` |
+| `MAX_ROWS` | Largest accepted row count: `12` |
 | `DEFAULT_STEP` | Base animation delay: `750ms` |
 | `CELL_WIDTH` | Width used to position cells: `80px` |
 | `CELL_HEIGHT` | Cell height: `92.38px` |
