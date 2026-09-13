@@ -14,6 +14,35 @@
 
     <div id="triangle"></div>
 
+    <div class="row-form speed-control">
+        <label for="speed">Animation speed: <output id="speed-value">1x</output></label>
+        <input id="speed" type="range" min="0.25" max="4" step="any" value="1"
+            aria-label="Animation speed">
+        <div class="speed-labels" aria-hidden="true">
+            <span>Slower</span>
+            <span>Faster</span>
+        </div>
+    </div>
+
+    <form id="initial-form" class="row-form" novalidate>
+        <label for="initial-rows">How many rows should Pascal's triangle have?</label>
+        <div class="form-controls">
+            <input id="initial-rows" name="rows" type="number" min="1" max="10" step="1" required
+                aria-describedby="initial-error" autofocus>
+            <button type="submit">Build triangle</button>
+        </div>
+        <p id="initial-error" class="form-error" role="alert"></p>
+    </form>
+
+    <form id="rows-form" class="row-form rebuild-form" novalidate hidden>
+        <label for="rows">Build another triangle</label>
+        <div class="form-controls">
+            <input id="rows" name="rows" type="number" min="1" max="10" step="1" required aria-describedby="rows-error">
+            <button type="submit">Rebuild</button>
+        </div>
+        <p id="rows-error" class="form-error" role="alert"></p>
+    </form>
+
     <script src="script.js"></script>
 
 </body>
