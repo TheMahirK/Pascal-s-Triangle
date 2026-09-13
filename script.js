@@ -14,6 +14,9 @@ const ROW_GAP = 69;
 const MIN_ROWS = 1;
 const MAX_ROWS = 12;
 const DEFAULT_STEP = 750;
+const DROP_STEP = 600;
+const PLUS_STEP = 260;
+const PLUS_LEAD = 140;
 let animationNumber = 0;
 
 
@@ -51,8 +54,8 @@ function createTriangle(data) {
     triangle.style.width = `${data.length * CELL_WIDTH}px`;
     triangle.style.height = `${CELL_HEIGHT + (data.length - 1) * ROW_GAP}px`;
 
-    data.forEach((row, rowIndex) => {
-        row.forEach((_, columnIndex) => {
+    data.forEach(function (row, rowIndex) {
+        row.forEach(function (_, columnIndex) {
             const cell = document.createElement("div");
             const number = document.createElement("span");
             const left = (data.length - row.length) * CELL_WIDTH / 2
@@ -82,8 +85,64 @@ function setCellText(cell, text) {
 }
 
 
+function createFallingNumber(sourceCell, targetCell, value, targetOffset) {
+    const number = document.createElement("span");
+    const sourceLeft = Number.parseFloat(sourceCell.style.left);
+    const sourceTop = Number.parseFloat(sourceCell.style.top);
+    const targetLeft = Number.parseFloat(targetCell.style.left);
+    const targetTop = Number.parseFloat(targetCell.style.top);
+
+    number.className = "falling-number";
+    number.textContent = value;
+    number.style.setProperty("--operand-font-size", `${getOperandFontSize(value)}px`);
+    number.style.left = `${sourceLeft}px`;
+    number.style.top = `${sourceTop}px`;
+    // Animate a cloned value from its parent cell to its reserved side of the target.
+    number.style.setProperty(
+        "--drop-x",
+        `${targetLeft - sourceLeft + targetOffset}px`
+    );
+    number.style.setProperty("--drop-y", `${targetTop - sourceTop}px`);
+    triangle.appendChild(number);
+
+    requestAnimationFrame(function () {
+        number.classList.add("dropping");
+    });
+    return number;
+}
+
+
+function getOperandFontSize(value) {
+    const digitCount = String(value).length;
+    return digitCount >= 4 ? 14 : digitCount === 3 ? 16 : digitCount === 2 ? 22 : 30;
+}
+
+
+function getOperandOffset(leftValue, rightValue) {
+    const fontSize = Math.min(
+        getOperandFontSize(leftValue),
+        getOperandFontSize(rightValue)
+    );
+    const widestValue = Math.max(String(leftValue).length, String(rightValue).length);
+    const estimatedTextWidth = widestValue * fontSize * 0.6;
+    const plusHalfWidth = fontSize * 0.35;
+
+    // Leave a center lane for the plus while keeping both operands inside the cell.
+    return Math.min(25, Math.ceil(estimatedTextWidth / 2 + plusHalfWidth + 4));
+}
+
+
+function createPlus(cell) {
+    const operator = document.createElement("span");
+    operator.className = "operator";
+    operator.textContent = "+";
+    cell.appendChild(operator);
+    return operator;
+}
+
+
 function wait(step) {
-    return new Promise(resolve => {
+    return new Promise(function (resolve) {
         setTimeout(resolve, step / getSpeed());
     });
 }
@@ -144,25 +203,63 @@ async function buildTriangle(rowCount) {
             const leftParent = getCell(row - 1, column - 1);
             const rightParent = getCell(row - 1, column);
             const currentCell = getCell(row, column);
+            const leftValue = data[row - 1][column - 1];
+            const rightValue = data[row - 1][column];
+            const operandFontSize = Math.min(
+                getOperandFontSize(leftValue),
+                getOperandFontSize(rightValue)
+            );
+            const operandOffset = getOperandOffset(leftValue, rightValue);
 
             leftParent.classList.add("orange");
             rightParent.classList.add("orange");
-            currentCell.classList.add("green", "calculating");
-            setCellText(
+            const leftNumber = createFallingNumber(
+                leftParent,
                 currentCell,
-                `${data[row - 1][column - 1]} + ${data[row - 1][column]}`
+                leftValue,
+                -operandOffset
             );
+            const rightNumber = createFallingNumber(
+                rightParent,
+                currentCell,
+                rightValue,
+                operandOffset
+            );
+            currentCell.classList.add("green", "calculating");
+            const operator = createPlus(currentCell);
+            currentCell.style.setProperty("--operand-font-size", `${operandFontSize}px`);
 
-            await wait(DEFAULT_STEP);
+            // Reveal the plus shortly before the operands finish their drop.
+            await wait(DROP_STEP - PLUS_LEAD);
             if (!isCurrentAnimation(thisAnimation)) return;
 
-            setCellText(currentCell, data[row][column]);
+            operator.classList.add("visible");
+            await wait(PLUS_LEAD);
+            if (!isCurrentAnimation(thisAnimation)) return;
+
+            await wait(PLUS_STEP);
+            if (!isCurrentAnimation(thisAnimation)) return;
+
+            leftNumber.classList.add("fading");
+            rightNumber.classList.add("fading");
+            await wait(PLUS_STEP);
+            if (!isCurrentAnimation(thisAnimation)) return;
+
+            // Swap the fading operands for the final value after the handoff.
+            leftNumber.remove();
+            rightNumber.remove();
+            currentCell.replaceChildren();
+            const result = document.createElement("span");
+            result.textContent = data[row][column];
+            result.className = "result";
+            currentCell.appendChild(result);
             await wait(DEFAULT_STEP);
 
             leftParent.classList.remove("orange");
             rightParent.classList.remove("orange");
             currentCell.classList.remove("green", "calculating");
             currentCell.classList.add("cyan");
+            currentCell.style.removeProperty("--operand-font-size");
             await wait(DEFAULT_STEP);
         }
     }
@@ -209,14 +306,18 @@ function updateSpeed() {
         "--animation-duration",
         `${350 / speed}ms`
     );
+    document.documentElement.style.setProperty(
+        "--drop-duration",
+        `${DROP_STEP / speed}ms`
+    );
 }
 
 
-initialForm.addEventListener("submit", event => {
+initialForm.addEventListener("submit", function (event) {
     submitRows(event, initialInput, initialError, true);
 });
 
-rowsForm.addEventListener("submit", event => {
+rowsForm.addEventListener("submit", function (event) {
     submitRows(event, rowsInput, rowsError, false);
 });
 

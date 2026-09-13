@@ -91,8 +91,9 @@ though the user-facing limit is 12 rows.
 3. The first and last values of the row turn cyan.
 4. For inner values:
    - The two parent cells turn orange.
-   - The current cell turns green and displays the addition.
-   - The calculated value replaces the addition.
+   - Both orange values drop into opposite sides of the destination cell at the same time.
+   - The destination cell turns green and the plus symbol appears just before the values settle.
+   - The calculated value replaces the addition with a smooth entrance.
    - The completed cell turns cyan.
 5. The process continues until every row is complete.
 
