@@ -5,16 +5,26 @@
 body {
     margin: 0;
     min-height: 100vh;
+    min-height: 100svh;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
     background-color: black;
+    overflow-x: hidden;
+}
+
+.triangle-stage {
+    position: relative;
+    flex: none;
 }
 
 #triangle {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
 }
 
 .row-form {
@@ -56,6 +66,7 @@ body {
 
 .row-form input {
     width: 100%;
+    min-width: 0;
 }
 
 .row-form button {
@@ -230,6 +241,7 @@ body {
         opacity: 0;
         transform: translateY(-8px) scale(0.75);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -255,4 +267,59 @@ body {
 
 .calculating {
     transform: scale(1);
+}
+
+@media (max-width: 600px) {
+    .row-form {
+        width: calc(100vw - 24px);
+        padding: 16px;
+    }
+
+    .speed-control,
+    .rebuild-form {
+        width: min(320px, calc(100vw - 24px));
+    }
+
+    .row-form label {
+        font-size: 15px;
+    }
+
+    .row-form input,
+    .row-form button {
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    .row-form button {
+        padding-right: 8px;
+        padding-left: 8px;
+    }
+
+    .speed-control {
+        top: max(12px, env(safe-area-inset-top));
+        right: 12px;
+    }
+
+    .rebuild-form {
+        right: 12px;
+        bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    .form-error {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .row-form {
+        padding: 12px;
+    }
+
+    .form-controls {
+        gap: 6px;
+    }
+
+    .row-form button {
+        font-size: 14px;
+    }
 }

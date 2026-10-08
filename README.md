@@ -13,6 +13,7 @@ rebuild the triangle at any time.
 - Keeps the previous row count in the rebuild form.
 - Shows clear validation messages for invalid row counts.
 - Provides a continuous animation-speed slider in the top-right corner.
+- Scales the triangle to fit narrow and short screens, with mobile-friendly controls.
 - Stops an older animation when a new triangle is requested.
 - Uses only HTML, CSS, and JavaScript. No external libraries are required.
 

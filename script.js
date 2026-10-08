@@ -1,4 +1,5 @@
 const triangle = document.getElementById("triangle");
+const triangleStage = document.querySelector(".triangle-stage");
 const initialForm = document.getElementById("initial-form");
 const initialInput = document.getElementById("initial-rows");
 const initialError = document.getElementById("initial-error");
@@ -70,6 +71,24 @@ function createTriangle(data) {
             triangle.appendChild(cell);
         });
     });
+
+    resizeTriangle();
+}
+
+
+function resizeTriangle() {
+    const width = Number.parseFloat(triangle.style.width);
+    const height = Number.parseFloat(triangle.style.height);
+    if (!width || !height) return;
+
+    const mobileLayout = window.matchMedia("(max-width: 600px)").matches;
+    const availableWidth = Math.max(1, window.innerWidth - (mobileLayout ? 24 : 32));
+    const availableHeight = Math.max(1, window.innerHeight - (mobileLayout ? 200 : 80));
+    const scale = Math.min(1, availableWidth / width, availableHeight / height);
+
+    triangle.style.transform = `scale(${scale})`;
+    triangleStage.style.width = `${width * scale}px`;
+    triangleStage.style.height = `${height * scale}px`;
 }
 
 
@@ -322,4 +341,5 @@ rowsForm.addEventListener("submit", function (event) {
 });
 
 speedInput.addEventListener("input", updateSpeed);
+window.addEventListener("resize", resizeTriangle);
 updateSpeed();
