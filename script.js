@@ -1,5 +1,6 @@
 const triangle = document.getElementById("triangle");
 const triangleStage = document.querySelector(".triangle-stage");
+const speedControl = document.querySelector(".speed-control");
 const initialForm = document.getElementById("initial-form");
 const initialInput = document.getElementById("initial-rows");
 const initialError = document.getElementById("initial-error");
@@ -14,7 +15,6 @@ const CELL_WIDTH = 80;
 const CELL_HEIGHT = 92.38;
 const ROW_GAP = 69;
 const MIN_ROWS = 1;
-const MAX_ROWS = 12;
 const DEFAULT_STEP = 750;
 const DROP_STEP = 600;
 const PLUS_STEP = 260;
@@ -26,28 +26,17 @@ function getPascalTriangle(rowCount) {
     const triangleRows = [];
 
     for (let row = 0; row < rowCount; row++) {
-        const values = [];
+        const values = Array(row + 1).fill(1n);
 
-        for (let column = 0; column <= row; column++) {
-            values.push(getCombination(row, column));
+        for (let column = 1; column < row; column++) {
+            values[column] = triangleRows[row - 1][column - 1]
+                + triangleRows[row - 1][column];
         }
 
         triangleRows.push(values);
     }
 
     return triangleRows;
-}
-
-
-function getCombination(row, column) {
-    let result = 1;
-
-    for (let step = 0; step < column; step++) {
-        // Round after each division to remove floating-point representation drift.
-        result = Math.round(result * (row - step) / (step + 1));
-    }
-
-    return result;
 }
 
 
@@ -84,14 +73,23 @@ function resizeTriangle() {
     const height = Number.parseFloat(triangle.style.height);
     if (!width || !height) return;
 
-    const mobileLayout = window.matchMedia("(max-width: 600px)").matches;
-    const availableWidth = Math.max(1, window.innerWidth - (mobileLayout ? 24 : 32));
-    const availableHeight = Math.max(1, window.innerHeight - (mobileLayout ? 200 : 80));
+    const horizontalMargin = window.matchMedia("(max-width: 600px)").matches ? 24 : 32;
+    const topReserve = speedControl.getBoundingClientRect().bottom + 16;
+    const bottomReserve = rowsForm.hidden
+        ? 16
+        : window.innerHeight - rowsForm.getBoundingClientRect().top + 16;
+    const availableWidth = Math.max(1, window.innerWidth - horizontalMargin);
+    const availableHeight = Math.max(
+        1,
+        window.innerHeight - topReserve - bottomReserve
+    );
     const scale = Math.min(1, availableWidth / width, availableHeight / height);
+    const verticalOffset = (topReserve - bottomReserve) / 2;
 
     triangle.style.transform = `scale(${scale})`;
     triangleStage.style.width = `${width * scale}px`;
     triangleStage.style.height = `${height * scale}px`;
+    triangleStage.style.top = `${verticalOffset}px`;
 }
 
 
@@ -101,7 +99,8 @@ function getCell(row, column) {
 
 
 function setCellText(cell, text) {
-    cell.querySelector("span").textContent = text;
+    cell.querySelector("span").textContent = String(text);
+    cell.style.setProperty("--operand-font-size", `${getResultFontSize(text)}px`);
 }
 
 
@@ -134,7 +133,14 @@ function createFallingNumber(sourceCell, targetCell, value, targetOffset) {
 
 function getOperandFontSize(value) {
     const digitCount = String(value).length;
-    return digitCount >= 4 ? 14 : digitCount === 3 ? 16 : digitCount === 2 ? 22 : 30;
+    return digitCount === 1 ? 30 : digitCount === 2 ? 22 : digitCount === 3 ? 16 :
+        Math.min(14, 56 / (digitCount * 0.6));
+}
+
+
+function getResultFontSize(value) {
+    const digitCount = String(value).length;
+    return Math.min(30, 70 / (digitCount * 0.6));
 }
 
 
@@ -270,8 +276,9 @@ async function buildTriangle(rowCount) {
             rightNumber.remove();
             currentCell.replaceChildren();
             const result = document.createElement("span");
-            result.textContent = data[row][column];
+            result.textContent = String(data[row][column]);
             result.className = "result";
+            result.style.fontSize = `${getResultFontSize(data[row][column])}px`;
             currentCell.appendChild(result);
             await wait(DEFAULT_STEP);
 
@@ -289,14 +296,14 @@ async function buildTriangle(rowCount) {
 function validateRows(input, error) {
     const rows = Number(input.value);
 
-    if (!Number.isInteger(rows) || rows < MIN_ROWS) {
-        error.textContent = "Enter a value greater than or equal to 1.";
+    if (!Number.isSafeInteger(rows)) {
+        error.textContent = "Enter a whole number within JavaScript's safe integer range.";
         input.focus();
         return null;
     }
 
-    if (rows > MAX_ROWS) {
-        error.textContent = `Enter a value less than or equal to ${MAX_ROWS}.`;
+    if (rows < MIN_ROWS) {
+        error.textContent = "Enter a value greater than or equal to 1.";
         input.focus();
         return null;
     }
