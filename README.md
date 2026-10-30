@@ -1,9 +1,6 @@
-
 # Pascal's Triangle Visualizer
 
-A small browser application that generates and animates Pascal's Triangle. The
-user chooses the number of rows, watches the values being calculated, and can
-rebuild the triangle at any time.
+A dependency-free web app that builds and animates Pascal's Triangle.
 
 ## Features
 
@@ -35,11 +32,9 @@ the user can try again.
 
 ## Project files
 
-| File | Purpose |
-| --- | --- |
-| `index.html` | Page structure, row forms, and speed control |
-| `style.css` | Layout, colors, hexagonal cells, and transitions |
-| `script.js` | Triangle mathematics, validation, and animation |
+- `index.html` — page structure and controls
+- `style.css` — layout, responsive styling, and animation effects
+- `script.js` — coefficient calculation, validation, and animation
 
 ## Pascal's Triangle mathematics
 
@@ -64,10 +59,10 @@ The first row uses `n = 0`, so the generated values begin as:
 1 3 3 1
 ```
 
-The code calculates each row independently and stores the result as a
-two-dimensional array. Coefficients use JavaScript `BigInt` values to remain
-exact as row counts grow. The triangle and its text scale to fit the space
-between the on-screen controls and the viewport edges.
+The code calculates each row and stores it in a two-dimensional array.
+Coefficients use JavaScript `BigInt` values to remain exact as row counts
+grow. The triangle and its text scale to fit the space between the on-screen
+controls and the viewport edges.
 
 ## JavaScript functions
 

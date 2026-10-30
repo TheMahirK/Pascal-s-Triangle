@@ -9,6 +9,7 @@ const rowsInput = document.getElementById("rows");
 const rowsError = document.getElementById("rows-error");
 const speedInput = document.getElementById("speed");
 const speedValue = document.getElementById("speed-value");
+let cells = [];
 
 const CELL_WIDTH = 80;
 const CELL_HEIGHT = 92.38;
@@ -41,6 +42,9 @@ function getPascalTriangle(rowCount) {
 
 function createTriangle(data) {
     triangle.innerHTML = "";
+    cells = data.map(function (row) {
+        return new Array(row.length);
+    });
     triangle.style.width = `${data.length * CELL_WIDTH}px`;
     triangle.style.height = `${CELL_HEIGHT + (data.length - 1) * ROW_GAP}px`;
 
@@ -54,10 +58,9 @@ function createTriangle(data) {
             cell.className = "cell";
             cell.style.left = `${left}px`;
             cell.style.top = `${rowIndex * ROW_GAP}px`;
-            cell.dataset.row = rowIndex;
-            cell.dataset.column = columnIndex;
             cell.appendChild(number);
             triangle.appendChild(cell);
+            cells[rowIndex][columnIndex] = cell;
         });
     });
 
@@ -91,9 +94,7 @@ function resizeTriangle() {
 
 
 function getCell(row, column) {
-    return document.querySelector(
-        `.cell[data-row="${row}"][data-column="${column}"]`
-    );
+    return cells[row][column];
 }
 
 
