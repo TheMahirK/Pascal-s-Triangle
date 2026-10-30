@@ -18,6 +18,7 @@ body {
 .triangle-stage {
     position: relative;
     flex: none;
+    transition: top 200ms ease;
 }
 
 #triangle {
